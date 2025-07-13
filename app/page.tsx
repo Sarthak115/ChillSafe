@@ -251,13 +251,13 @@ export default function IoTDashboard() {
               ${historicalData
                 .map(
                   (item) =>
-                    `<tr><td>${new Date(item.timestamp).toLocaleString()}</td><td>${item.temp}°C</td><td>${item.humidity}%</td><td>${item.gas} ppm</td></tr>`,
+                    `<tr><td>${formatTimestamp(item.timestamp)}</td><td>${item.temp}°C</td><td>${item.humidity}%</td><td>${item.gas} ppm</td></tr>`,
                 )
                 .join("")}
-            </table>
-          </body>
-        </html>
-      `)
+          </table>
+        </body>
+      </html>
+    `)
       printWindow.document.close()
       printWindow.print()
     }
@@ -439,7 +439,17 @@ export default function IoTDashboard() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+              {/* Data Summary */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center text-sm text-muted-foreground">
+                    Showing {filteredHistoricalData.length} data points from the last {timeRange}
+                    {historicalData.length === 0 && " (No historical data available)"}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-1 gap-6">
                 {/* Temperature Chart */}
                 <Card>
                   <CardHeader>
@@ -449,15 +459,39 @@ export default function IoTDashboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={filteredHistoricalData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="temp" stroke="#ef4444" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    {filteredHistoricalData.length > 0 ? (
+                      <div className="w-full h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={filteredHistoricalData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis dataKey="time" tick={{ fontSize: 12 }} interval="preserveStartEnd" />
+                            <YAxis
+                              tick={{ fontSize: 12 }}
+                              label={{ value: "°C", angle: -90, position: "insideLeft" }}
+                            />
+                            <Tooltip
+                              labelFormatter={(label) => `Time: ${label}`}
+                              formatter={(value) => [`${value}°C`, "Temperature"]}
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey="temp"
+                              stroke="#ef4444"
+                              strokeWidth={2}
+                              dot={{ fill: "#ef4444", strokeWidth: 2, r: 3 }}
+                              activeDot={{ r: 5, stroke: "#ef4444", strokeWidth: 2 }}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    ) : (
+                      <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                        <div className="text-center">
+                          <Thermometer className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>No temperature data available for the selected time range</p>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -470,15 +504,36 @@ export default function IoTDashboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={filteredHistoricalData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="humidity" stroke="#3b82f6" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    {filteredHistoricalData.length > 0 ? (
+                      <div className="w-full h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={filteredHistoricalData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis dataKey="time" tick={{ fontSize: 12 }} interval="preserveStartEnd" />
+                            <YAxis tick={{ fontSize: 12 }} label={{ value: "%", angle: -90, position: "insideLeft" }} />
+                            <Tooltip
+                              labelFormatter={(label) => `Time: ${label}`}
+                              formatter={(value) => [`${value}%`, "Humidity"]}
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey="humidity"
+                              stroke="#3b82f6"
+                              strokeWidth={2}
+                              dot={{ fill: "#3b82f6", strokeWidth: 2, r: 3 }}
+                              activeDot={{ r: 5, stroke: "#3b82f6", strokeWidth: 2 }}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    ) : (
+                      <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                        <div className="text-center">
+                          <Droplets className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>No humidity data available for the selected time range</p>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -491,15 +546,39 @@ export default function IoTDashboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={filteredHistoricalData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="time" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="gas" stroke="#10b981" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    {filteredHistoricalData.length > 0 ? (
+                      <div className="w-full h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={filteredHistoricalData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                            <XAxis dataKey="time" tick={{ fontSize: 12 }} interval="preserveStartEnd" />
+                            <YAxis
+                              tick={{ fontSize: 12 }}
+                              label={{ value: "ppm", angle: -90, position: "insideLeft" }}
+                            />
+                            <Tooltip
+                              labelFormatter={(label) => `Time: ${label}`}
+                              formatter={(value) => [`${value} ppm`, "Gas Level"]}
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey="gas"
+                              stroke="#10b981"
+                              strokeWidth={2}
+                              dot={{ fill: "#10b981", strokeWidth: 2, r: 3 }}
+                              activeDot={{ r: 5, stroke: "#10b981", strokeWidth: 2 }}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    ) : (
+                      <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                        <div className="text-center">
+                          <Wind className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>No gas data available for the selected time range</p>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
